@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Jan 18 21:42:54 2020
-Seeds is a small neural network model that attempts to classify a type of 
+Seeds is a k-Nearest Neighbors model that attempts to classify a type of 
 seed as either Kama, Rosa, or Canadian wheat by using seven geometric 
 properties of the seeds. They are, according to their columns, 1)area 
 2)perimeter 3)compactness (4*pi*A/p^2) 4)length 5)width 6)asymmetry 
@@ -30,8 +30,11 @@ y=seeds['class'].values
 X_train, X_test, y_train, y_test= train_test_split(X,y,test_size=0.2,\
                                                    random_state=11,stratify=y)
 
-#A quick histogram to visualize the data.
+#A quick histogram to visualize the data (created using Orange):
+plt.figure(figsize=(8,6))
 plt.imshow(img.imread('seeds_hist.png'))
+plt.title('Comparing Length & Groove Length')
+plt.show()
 
 #Choose the best value for number of nearest neighbors:
 """The best score is for when n_neighbors=5 or 7. """
@@ -40,8 +43,13 @@ for n in range(3,15):
     knn=KNeighborsClassifier(n_neighbors=n)
     knn.fit(X_train,y_train)
     scr_lst.append(knn.score(X_test,y_test))
-print(scr_lst)
+
+plt.figure()
 plt.scatter(np.arange(3,15),scr_lst)
+plt.title('Scores w/ Different k Values')
+plt.xlabel('# of nearest neighbors (k)')
+plt.ylabel('accuracy score')
+plt.show()
 
 #Create the classifier and fit to the training data:
 knn=KNeighborsClassifier(n_neighbors=5)
@@ -51,18 +59,16 @@ knn.fit(X_train,y_train)
 prediction = list(knn.predict(X_test))
 
 #Populate a list of names for the predictions:
-pred_lst=[]
-for i in prediction:
-    pred_lst.append(classes[i-1])
+pred_lst=[classes[i-1] for i in prediction]
 
 #Analyse the results:
-score = knn.score(X_test,y_test)
+score = round(knn.score(X_test,y_test),3)*100
 comparison=prediction==y_test
 results=list(zip(pred_lst,comparison))
 
 #Print the results and analysis:
-print('Using a kNN approach:')
-print(results,'\n\n Score:',score)
+print('\nResults using a kNN approach:')
+print(results,'\n\n Score:',score,'%')
 
 
 
